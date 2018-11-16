@@ -1,0 +1,22 @@
+version: '3'
+
+networks:
+  byfn:
+    external:
+      name: net_byfn
+
+services:
+  nodeapp:
+    image: DataXchain/dataplatform:latest
+    ports:
+    - "5000:31651"
+    tty: true
+    #command: node /usr/src/app/web/app.js
+    command: bash
+    volumes:
+    - ./:/usr/src/app
+    - /usr/src/app/web/node_modules
+    - /usr/src/app/middleware/node_modules
+    container_name: nodeapp
+    networks:
+    - byfn

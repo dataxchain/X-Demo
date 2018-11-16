@@ -1,0 +1,57 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: ipfs-deployment
+  labels:
+    service: ipfs
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        service: ipfs
+    spec:
+      containers:
+      - name: ipfs
+        image: "DataXchain/ipfs:latest"
+        imagePullPolicy: Always
+        volumeMounts:
+        - name: ipfs-storage
+          mountPath: /root/.ipfs
+      volumes:
+      - name: ipfs-storage
+        persistentVolumeClaim:
+          claimName: ipfs-pv-claim
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ipfs-service
+  namespace: default
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 4001
+    name: swarm-port
+    targetPort: 4001
+  - port: 5001
+    name: api-port
+    targetPort: 5001
+  - port: 8081
+    name: gateway-port
+    targetPort: 8080
+  selector:
+    service: ipfs
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ipfs-pv-claim
+  labels:
+    app: ipfs
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 120Gi

@@ -1,0 +1,36 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: pyapp
+  labels:
+    service: pyapp
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        service: pyapp
+    spec:
+      containers:
+      - name: pytest
+        image: "DataXchain/dataplatform:latest"
+        command: ["sleep"]
+        args: ["1000000"]
+        imagePullPolicy: Always 
+      imagePullSecrets:
+        - name: myregistrykey
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pyapp
+  namespace: default
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 5000
+      name: flask-port
+      targetPort: 5000
+      nodePort: 31641
+  selector:
+    service: pyapp

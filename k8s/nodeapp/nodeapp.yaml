@@ -1,0 +1,36 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: nodeapp
+  labels:
+    service: nodeapp
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        service: nodeapp
+    spec:
+      containers:
+      - name: nodetest
+        image: "DataXchain/dataplatform:latest"
+        command: ["sleep"]
+        args: ["1000000"]
+        imagePullPolicy: Always 
+      imagePullSecrets:
+        - name: myregistrykey
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nodeapp
+  namespace: default
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 5000
+      name: web-port
+      targetPort: 5000
+      nodePort: 31651
+  selector:
+    service: nodeapp
